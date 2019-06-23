@@ -3,8 +3,24 @@
  *  Cristian Etchebarne
  */
 
+import { CorsOptions } from 'cors';
+
 const localDB = 'mongodb://localhost:27017/coffe';
 const productionDB = process.env.MONGO_URI;
+
+export const corsConfig: CorsOptions = {
+  allowedHeaders: [
+    'Origin',
+    'X-Requested-With',
+    'Content-Type',
+    'Accept',
+    'X-Access-Token',
+  ],
+  credentials: true,
+  methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
+  origin: '',
+  preflightContinue: false,
+};
 
 /**
  * Puerto
