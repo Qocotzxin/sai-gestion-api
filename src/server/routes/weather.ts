@@ -5,7 +5,6 @@
 
 import express, { Response, Request } from 'express';
 import request from 'request';
-import { enableCors } from '../middlewares/cors';
 import {
   IpLocation,
   SimpleCoordinates,
@@ -70,7 +69,7 @@ const searchLocationByIp = (res: Response) => {
   );
 };
 
-app.post('/v1/weather/current', [enableCors], (req: Request, res: Response) => {
+app.post('/v1/weather/current', (req: Request, res: Response) => {
   if (!req.body.position) {
     searchLocationByIp(res);
   } else {
