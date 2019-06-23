@@ -18,7 +18,7 @@ export const corsConfig: CorsOptions = {
   ],
   credentials: true,
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin: '',
+  origin: 'https://sai-gestion-app.herokuapp.com/',
   preflightContinue: false,
 };
 
