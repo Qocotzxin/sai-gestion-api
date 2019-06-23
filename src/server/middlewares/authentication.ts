@@ -18,7 +18,6 @@ const tokenVerify = (req: Request, res: Response, next: NextFunction) => {
     (err: JsonWebTokenError, decoded: DecodeOptions) => {
       if (err)
         return res.status(401).json({ err: { message: 'Invalid token' } });
-      console.log(decoded);
       next();
     }
   );
