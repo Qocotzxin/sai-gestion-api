@@ -69,7 +69,7 @@ const searchLocationByIp = (res: Response) => {
   );
 };
 
-app.post('v1/weather/current', (req: Request, res: Response) => {
+app.post('/v1/weather/current', (req: Request, res: Response) => {
   if (!req.body.position) {
     searchLocationByIp(res);
   } else {
