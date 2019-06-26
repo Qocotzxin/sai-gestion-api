@@ -3,29 +3,15 @@
  *  Cristian Etchebarne
  */
 
-export interface IpLocation {
+export interface IPInfoResponse {
   ip: string;
-  isp: string;
-  org: string;
-  hostname: string;
-  longitude: string;
-  latitude: string;
-  postal_code: string;
   city: string;
-  country_code: string;
-  country_name: string;
-  continent_code: string;
   region: string;
-  district: string;
-  timezone_name: string;
-  connection_type: string;
-  asn_number: string;
-  asn_org: string;
-  asn: string;
-  currency_code: string;
-  currency_name: string;
-  success: string;
-  cached: string;
+  country: string;
+  loc: string;
+  hostname: string;
+  postal: string;
+  org: string;
 }
 
 export interface SimpleCoordinates {
@@ -34,8 +20,8 @@ export interface SimpleCoordinates {
 }
 
 export interface WeatherDataParams {
-  coordinates?: SimpleCoordinates | IpLocation;
-  country?: string;
+  coordinates?: SimpleCoordinates;
+  city?: string;
 }
 
 export interface OpenWeatherApiResponse {

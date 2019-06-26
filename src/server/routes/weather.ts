@@ -3,37 +3,50 @@
  *  Cristian Etchebarne
  */
 
-import express, { Response, Request } from 'express';
+import express, { Request, Response } from 'express';
 import request from 'request';
 import {
-  IpLocation,
-  SimpleCoordinates,
+  IPINFO_TOKEN,
+  IPINFO_URL,
+  OW_BASEPATH,
+  OW_PARAMS,
+} from '../config/config';
+import {
+  IPInfoResponse,
   OpenWeatherApiResponse,
+  SimpleCoordinates,
   WeatherDataParams,
 } from '../models/weather';
 
 const app = express();
-const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?';
-const apiData = '&appid=dd38ea8bc2ba3a1e81d195a9d4a7be24&lang=es&units=metric';
 
+/**
+ * Obtiene el clima del momento mediante latitud/longitud
+ * o mediante la ciudad.
+ * @param positionData: WeatherDataParams
+ * @param res: Response
+ */
 const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
   let requestUrl;
 
   if (positionData.coordinates) {
+    // Setea la url para buscar por coordenadas
     const { latitude, longitude } = positionData.coordinates;
     requestUrl = {
-      url: `${apiUrl}lat=${latitude}&lon=${longitude}${apiData}`,
+      url: `${OW_BASEPATH}lat=${latitude}&lon=${longitude}${OW_PARAMS}`,
     };
   } else {
-    const country = positionData.country;
+    // Setea la url buscar por ciudad
+    const city = positionData.city;
     requestUrl = {
-      url: `${apiUrl}q=${country}${apiData}`,
+      url: `${OW_BASEPATH}q=${city}${OW_PARAMS}`,
     };
   }
 
   request(
+    // Realiza el pedido
     requestUrl,
-    (error: Error, response: request.Response, body: string) => {
+    (error: Error, _response: request.Response, body: string) => {
       const parsedBody: OpenWeatherApiResponse = JSON.parse(body);
 
       if (error || +parsedBody.cod !== 200) {
@@ -47,31 +60,48 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
   );
 };
 
-const searchLocationByIp = (res: Response) => {
+/**
+ * Si el usuario bloque el gps, este metodo busca las coordenadas
+ * o la ciudad mediante la ip.
+ * @param req: Request
+ * @param res: Response
+ * @returns void
+ */
+const searchLocationByIp = (req: Request, res: Response): void => {
   request(
-    { url: 'https://json.geoiplookup.io' },
-    (error: Error, response: request.Response, body: string) => {
+    {
+      // Se busca la ip en el request solo en produccion para evitar que tome la IP del proxy de Heroku
+      url:
+        process.env.NODE_ENV !== 'dev'
+          ? `${IPINFO_URL}/${req.ip}${IPINFO_TOKEN}`
+          : `${IPINFO_URL}${IPINFO_TOKEN}`,
+    },
+    (error: Error, _response: request.Response, body: string) => {
       if (error) return res.status(500).json({ ok: false, err: error.message });
+      const parsedBody: IPInfoResponse = JSON.parse(body);
 
-      const parsedBody: IpLocation = JSON.parse(body);
-
-      if (parsedBody.latitude) {
+      if (parsedBody.loc) {
         const coordinates: SimpleCoordinates = {
-          latitude: +parsedBody.latitude,
-          longitude: +parsedBody.longitude,
+          latitude: +parsedBody.loc.split(',')[0],
+          longitude: +parsedBody.loc.split(',')[1],
         };
+
         getWeatherData({ coordinates }, res);
       } else {
-        const country = parsedBody.country_name;
-        getWeatherData({ country }, res);
+        const city = parsedBody.city;
+        getWeatherData({ city }, res);
       }
     }
   );
 };
 
-app.post('/v1/weather/current', (req: Request, res: Response) => {
+/**
+ * Endpoint del tipo POST que devuelve el clima actual basado en la ubicacion del usuario.
+ * Se le puede enviar un body con las coordenadas.
+ */
+app.post('/v1/weather/current', (req: Request, res: Response): void => {
   if (!req.body.position) {
-    searchLocationByIp(res);
+    searchLocationByIp(req, res);
   } else {
     getWeatherData({ coordinates: req.body.position }, res);
   }
