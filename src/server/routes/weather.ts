@@ -66,6 +66,7 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
  */
 const searchLocationByIp = (req: Request, res: Response): void => {
   console.log(req.ip);
+  console.log(req.headers['x-forwarded-for']);
   request(
     {
       // Se busca la ip en el request solo en produccion para evitar que tome la IP del proxy de Heroku
