@@ -30,13 +30,11 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
   let requestUrl;
 
   if (positionData.coordinates) {
-    // Setea la url para buscar por coordenadas
     const { latitude, longitude } = positionData.coordinates;
     requestUrl = {
       url: `${OW_BASEPATH}lat=${latitude}&lon=${longitude}${OW_PARAMS}`,
     };
   } else {
-    // Setea la url buscar por ciudad
     const city = positionData.city;
     requestUrl = {
       url: `${OW_BASEPATH}q=${city}${OW_PARAMS}`,
@@ -44,7 +42,6 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
   }
 
   request(
-    // Realiza el pedido
     requestUrl,
     (error: Error, _response: request.Response, body: string) => {
       const parsedBody: OpenWeatherApiResponse = JSON.parse(body);
@@ -68,6 +65,7 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
  * @returns void
  */
 const searchLocationByIp = (req: Request, res: Response): void => {
+  console.log(req.ip);
   request(
     {
       // Se busca la ip en el request solo en produccion para evitar que tome la IP del proxy de Heroku
