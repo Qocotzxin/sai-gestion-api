@@ -8,7 +8,7 @@ import { CorsOptions } from 'cors';
 /**
  * URL de la DB de desarrollo
  */
-const DEV_DB = 'mongodb://localhost:27017/coffe';
+const DEV_DB = 'mongodb://localhost:27017/sai-gestion-api';
 
 /**
  * URL de la DB de produccion
@@ -43,7 +43,7 @@ process.env.URL_DB = process.env.NODE_ENV === 'dev' ? DEV_DB : PROD_DB;
 /**
  * Expiracion del token
  */
-process.env.TOKEN_EXPIRATION = '30 days';
+process.env.TOKEN_EXPIRATION = '1 hour';
 
 /**
  * Seed del token

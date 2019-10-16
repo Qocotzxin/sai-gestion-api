@@ -3,8 +3,9 @@
  *  Cristian Etchebarne
  */
 
-import jsonwebtoken, { JsonWebTokenError, DecodeOptions } from 'jsonwebtoken';
-import { NextFunction, Response, Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import jsonwebtoken, { DecodeOptions, JsonWebTokenError } from 'jsonwebtoken';
+import { ERROR_TYPE, setErrorResponse } from '../config/error';
 
 /**
  * Verifies token
@@ -17,7 +18,7 @@ const tokenVerify = (req: Request, res: Response, next: NextFunction) => {
     process.env.TOKEN_SEED,
     (err: JsonWebTokenError, decoded: DecodeOptions) => {
       if (err)
-        return res.status(401).json({ err: { message: 'Invalid token' } });
+        return setErrorResponse(res, ERROR_TYPE.FORBIDDEN);
       next();
     }
   );

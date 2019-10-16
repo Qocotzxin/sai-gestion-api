@@ -5,28 +5,17 @@
 
 import express, { Request, Response } from 'express';
 import request from 'request';
-import {
-  IPINFO_TOKEN,
-  IPINFO_URL,
-  OW_BASEPATH,
-  OW_PARAMS,
-} from '../config/config';
-import {
-  IPInfoResponse,
-  OpenWeatherApiResponse,
-  SimpleCoordinates,
-  WeatherDataParams,
-} from '../models/weather';
+import { IPINFO_TOKEN, IPINFO_URL, OW_BASEPATH, OW_PARAMS } from '../config/config';
+import { IPInfoResponse, OpenWeatherApiResponse, SimpleCoordinates, WeatherDataParams } from '../models/weather';
 
 const app = express();
 
 /**
- * Obtiene el clima del momento mediante latitud/longitud
- * o mediante la ciudad.
+ * Gets current weather using lat/long or city.
  * @param positionData: WeatherDataParams
  * @param res: Response
  */
-const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
+function getWeatherData(positionData: WeatherDataParams, res: Response) {
   let requestUrl;
 
   if (positionData.coordinates) {
@@ -58,16 +47,15 @@ const getWeatherData = (positionData: WeatherDataParams, res: Response) => {
 };
 
 /**
- * Si el usuario bloque el gps, este metodo busca las coordenadas
- * o la ciudad mediante la ip.
+ * Gets coordinates or city by ip (in case geolocation fails or get blocked).
  * @param req: Request
  * @param res: Response
  * @returns void
  */
-const searchLocationByIp = (req: Request, res: Response): void => {
+function searchLocationByIp(req: Request, res: Response) {
   request(
     {
-      // Se busca la ip en el request solo en produccion para evitar que tome la IP del proxy de Heroku
+      // Get IP from request inly in production to avoid proxy from Heroku.
       url:
         process.env.NODE_ENV !== 'dev'
           ? `${IPINFO_URL}/${req.headers['x-forwarded-for']}${IPINFO_TOKEN}`
@@ -93,10 +81,10 @@ const searchLocationByIp = (req: Request, res: Response): void => {
 };
 
 /**
- * Endpoint del tipo POST que devuelve el clima actual basado en la ubicacion del usuario.
- * Se le puede enviar un body con las coordenadas.
+ * Endpoint: /v1/weather/current
+ * Retrieves current weather based on location.
  */
-app.post('/v1/weather/current', (req: Request, res: Response): void => {
+app.post('/v1/weather/current', (req: Request, res: Response) => {
   if (!req.body.position) {
     searchLocationByIp(req, res);
   } else {
