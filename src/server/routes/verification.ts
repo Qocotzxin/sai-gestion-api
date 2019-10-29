@@ -4,9 +4,9 @@
  */
 
 import express, { Request, Response } from 'express';
-import { User } from '../models/user';
 import { ERROR_TYPE, setErrorResponse } from '../config/error';
-const UserModel = require("../models/user");
+import { UserModel } from '../entities/models';
+const User = require("../entities/user");
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.get('/v1/verify', (req: Request, res: Response) => {
   const email = req.query.email;
   const username = req.query.username;
 
-  UserModel.findOne(email ? { email } : { username }, (error: Error, user: User) => {
+  User.findOne(email ? { email } : { username }, (error: Error, user: UserModel) => {
     if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
     if (user) return res.status(200).json({ ok: true, data: { exists: true }, message: 'A user already exists associated with this information.' });

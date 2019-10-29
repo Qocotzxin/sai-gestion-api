@@ -18,12 +18,12 @@ const PROD_DB = process.env.MONGO_URI;
 /**
  * URL de origen para setear en CORS (desarrollo)
  */
-const DEV_ORIGIN_BASEPATH = 'http://localhost:4200';
+export const DEV_ORIGIN_BASEPATH = 'http://localhost:4200';
 
 /**
  * URL de origen para setear en CORS (produccion)
  */
-const PROD_ORIGIN_BASEPATH = 'https://sai-gestion-app.herokuapp.com';
+export const PROD_ORIGIN_BASEPATH = 'https://sai-gestion-app.herokuapp.com';
 
 /**
  * Puerto
@@ -61,6 +61,11 @@ export const IPINFO_URL = 'https://ipinfo.io';
 export const IPINFO_TOKEN = '?token=022e2e7adeddef';
 
 /**
+ * Sendgrid API KEY.
+ */
+export const SENDGRID_API_KEY = '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';
+
+/**
  * Data de Open Weather API
  */
 export const OW_BASEPATH = 'https://api.openweathermap.org/data/2.5/weather?';
@@ -80,7 +85,6 @@ export const CORS_CONFIG: CorsOptions = {
   ],
   credentials: true,
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
-  origin:
-    process.env.NODE_ENV === 'dev' ? DEV_ORIGIN_BASEPATH : PROD_ORIGIN_BASEPATH,
+  origin: process.env.NODE_ENV === 'dev' ? DEV_ORIGIN_BASEPATH : PROD_ORIGIN_BASEPATH,
   preflightContinue: false,
 };

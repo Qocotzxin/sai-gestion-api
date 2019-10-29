@@ -4,38 +4,69 @@
  */
 
 import express, { Request, Response } from 'express';
-import jwt from "jsonwebtoken";
-import { User } from '../models/user';
+import { Document, Model } from 'mongoose';
+import { DEV_ORIGIN_BASEPATH, PROD_ORIGIN_BASEPATH } from '../config/config';
 import { ERROR_TYPE, setErrorResponse } from '../config/error';
-const UserModel = require("../models/user");
+import { mailer, setSignupEmailBody, setSignupEmailSubject } from '../controllers';
+import { UserModel, USER_ROLE } from '../entities/models';
+const User: Model<Document> = require("../entities/user");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
-const createToken = (user: User) => {
-  return jwt.sign({ user }, process.env.TOKEN_SEED, {
-    expiresIn: process.env.TOKEN_EXPIRATION
-  });
-};
-
 /**
- * Endpoint: /v1/login
- * Login endpoint that returns a jwt in case user is authorized.
+ * Saves the user in database and sends a confirmation email.
+ * @param req: Request 
+ * @param res: Response
  */
-app.post('/v1/login', (req: Request, res: Response) => {
-  const { username, password } = req.body;
+function createUser(req: Request, res: Response) {
+  const { email, firstname, lastname, username, password } = req.body.user;
 
-  UserModel.findOne({ username, password }, (error: Error, user: User) => {
+  User.find({}, (error: Error, users: UserModel[]) => {
     if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
-    if (!user) return setErrorResponse(res, ERROR_TYPE.UNAUTHORIZED);
+    const NewUser = new User({
+      email,
+      firstname,
+      lastname,
+      username,
+      password: bcrypt.hashSync(password, 10),
+      role: (users.length) ? USER_ROLE.EMPLOYEE : USER_ROLE.ADMIN
+    });
 
-    // if (!bcrypt.compareSync(password, user.password)) {
-    //   return res.status(400).json(unauthorizedError);
-    // }
+    NewUser.save().then((user: UserModel & Document) => {
+      if (!user) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
-    const token = createToken(user);
+      const emailOptions = {
+        to: [email],
+        from: 'no-reply@sai.com',
+        subject: setSignupEmailSubject(req.body.language),
+        html: setSignupEmailBody(`${process.env.NODE_ENV === 'dev' ? DEV_ORIGIN_BASEPATH : PROD_ORIGIN_BASEPATH}/profile/${user.id}`, req.body.language)
+      };
 
-    return res.status(200).json({ ok: true, data: { username, email: user.email, token }, message: 'User authorized' });
+      mailer.sendMail(emailOptions, (err, response) => {
+        if (err) {
+          User.find({ email }).remove().exec();
+          return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+        }
+        return res.status(201).json({ ok: true, data: null, message: 'User created.' });
+      });
+    });
+  });
+}
+
+/**
+ * Endpoint: /v1/signup
+ * Creates a new user and sends an email to confirm.
+ */
+app.post('/v1/signup', (req: Request, res: Response) => {
+
+  User.findOne({ $or: [{ username: req.body.user.username }, { email: req.body.user.email }] }, (error: Error, user: UserModel) => {
+    if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+
+    if (user) return res.status(200).json({ ok: false, data: null, message: 'FORMS_ERRORS.USER_EXISTS' });
+
+    return createUser(req, res);
   });
 
 });

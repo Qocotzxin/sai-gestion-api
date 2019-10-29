@@ -23,6 +23,8 @@
   "author": "Cristian Etchebarne",
   "license": "ISC",
   "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/nodemailer": "^6.2.2",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
@@ -32,6 +34,8 @@
     "moment": "^2.24.0",
     "mongoose": "^5.7.3",
     "mongoose-unique-validator": "^2.0.3",
+    "nodemailer": "^6.3.1",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "request": "^2.88.0",
     "rxjs": "^6.5.2",
     "typescript": "^3.5.2"

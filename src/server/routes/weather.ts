@@ -6,7 +6,7 @@
 import express, { Request, Response } from 'express';
 import request from 'request';
 import { IPINFO_TOKEN, IPINFO_URL, OW_BASEPATH, OW_PARAMS } from '../config/config';
-import { IPInfoResponse, OpenWeatherApiResponse, SimpleCoordinates, WeatherDataParams } from '../models/weather';
+import { IPInfoResponse, OpenWeatherApiResponse, SimpleCoordinates, WeatherDataParams } from '../entities/models/weather';
 
 const app = express();
 

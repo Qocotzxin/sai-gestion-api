@@ -3,18 +3,19 @@
  *  Cristian Etchebarne
  */
 
+import { USER_ROLE, USER_STATUS } from "./models";
+
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const userRoles = {
-  values: ['ADMIN', 'USER'],
-  message: '{VALUE} it not a valid role'
-}
+  values: ['ADMIN', 'EMPLOYEE'],
+  message: '{VALUE} it not a valid role.'
+};
 
-export interface User {
-  username: string;
-  email: string;
-  password: string;
-}
+const userStatus = {
+  values: ['PENDING', 'APPROVED', 'INACTIVE'],
+  message: '{VALUE} it not a valid status.'
+};
 
 const Schema = mongoose.Schema;
 
@@ -32,11 +33,32 @@ const userSchema = new Schema({
     unique: true,
     required: [true, "Email is mandatory"]
   },
+  firstname: {
+    type: String,
+    required: [true, "First name is mandatory"]
+  },
+  lastname: {
+    type: String,
+    required: [true, "Last name is mandatory"]
+  },
   password: {
     type: String,
     required: [true, "Password is mandatory"]
   },
-});
+  image: {
+    type: String,
+    required: false
+  },
+  role: {
+    type: USER_ROLE,
+    enum: userRoles
+  },
+  status: {
+    type: USER_STATUS,
+    default: "PENDING",
+    enum: userStatus
+  }
+}, { timestamps: true });
 
 /**
  * Avoids returning password in responses
