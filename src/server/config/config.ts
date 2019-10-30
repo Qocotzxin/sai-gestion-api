@@ -4,6 +4,7 @@
  */
 
 import { CorsOptions } from 'cors';
+import { KEYS } from './keys';
 
 /**
  * URL de la DB de desarrollo
@@ -48,7 +49,7 @@ process.env.TOKEN_EXPIRATION = '1 hour';
 /**
  * Seed del token
  */
-process.env.TOKEN_SEED = process.env.TOKEN_SEED || 'pchowypbldepymipkmzzyjsc';
+process.env.TOKEN_SEED = process.env.TOKEN_SEED || KEYS.SEED;
 
 /**
  * URL de IPInfo con token incluido
@@ -58,19 +59,18 @@ export const IPINFO_URL = 'https://ipinfo.io';
 /**
  * Token para IPInfo
  */
-export const IPINFO_TOKEN = '?token=022e2e7adeddef';
+export const IPINFO_TOKEN = `?token=${KEYS.IP_INFO}`;
 
 /**
  * Sendgrid API KEY.
  */
-export const SENDGRID_API_KEY = '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';
+export const SENDGRID_API_KEY = KEYS.SG;
 
 /**
  * Data de Open Weather API
  */
 export const OW_BASEPATH = 'https://api.openweathermap.org/data/2.5/weather?';
-export const OW_PARAMS =
-  '&appid=dd38ea8bc2ba3a1e81d195a9d4a7be24&lang=es&units=metric';
+export const OW_PARAMS = `&appid=${KEYS.OPEN_WEATHER}&lang=es&units=metric`;
 
 /**
  * Configuracion para CORS
