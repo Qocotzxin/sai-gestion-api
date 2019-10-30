@@ -8,7 +8,7 @@ import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { CORS_CONFIG } from './config/config';
-
+require('dotenv').config()
 require('./config/config');
 const compression = require('compression');
 const app = express();
@@ -22,7 +22,6 @@ mongoose.connect(
     }
   }
 );
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors(CORS_CONFIG));
