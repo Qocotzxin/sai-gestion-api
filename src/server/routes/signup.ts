@@ -5,7 +5,6 @@
 
 import express, { Request, Response } from 'express';
 import { Document, Model } from 'mongoose';
-import { DEV_ORIGIN_BASEPATH, PROD_ORIGIN_BASEPATH } from '../config/config';
 import { ERROR_TYPE, setErrorResponse } from '../config/error';
 import { mailer, setSignupEmailBody, setSignupEmailSubject } from '../controllers';
 import { UserModel, USER_ROLE } from '../entities/models';
@@ -22,8 +21,10 @@ const app = express();
 function createUser(req: Request, res: Response) {
   const { email, firstname, lastname, username, password } = req.body.user;
 
-  User.find({}, (error: Error, users: UserModel[]) => {
-    if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+  User.find({}, (e: Error, users: Document[]) => {
+    if (e) {
+      return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+    }
 
     const NewUser = new User({
       email,
@@ -34,22 +35,24 @@ function createUser(req: Request, res: Response) {
       role: (users.length) ? USER_ROLE.EMPLOYEE : USER_ROLE.ADMIN
     });
 
-    NewUser.save().then((user: UserModel & Document) => {
-      if (!user) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+    NewUser.save({}, (saveError: Error, savedUser: Document & UserModel) => {
+      if (saveError || !savedUser) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
       const emailOptions = {
         to: [email],
         from: 'no-reply@sai.com',
         subject: setSignupEmailSubject(req.body.language),
-        html: setSignupEmailBody(`${process.env.NODE_ENV === 'dev' ? DEV_ORIGIN_BASEPATH : PROD_ORIGIN_BASEPATH}/profile/${user.id}`, req.body.language)
+        html: setSignupEmailBody(`${process.env.ORIGIN_BASEPATH}/profile/${savedUser.id}`, req.body.language)
       };
 
       mailer.sendMail(emailOptions, (err, response) => {
         if (err) {
-          User.find({ email }).remove().exec();
-          return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+          User.findOneAndDelete({ email }, (error: Error, doc: Document) => {
+            return setErrorResponse(res, ERROR_TYPE.INTERNAL, 'User could not created due to email failure.');
+          });
+        } else {
+          return res.status(201).json({ ok: true, data: null, message: 'User created.' });
         }
-        return res.status(201).json({ ok: true, data: null, message: 'User created.' });
       });
     });
   });
@@ -61,14 +64,19 @@ function createUser(req: Request, res: Response) {
  */
 app.post('/v1/signup', (req: Request, res: Response) => {
 
-  User.findOne({ $or: [{ username: req.body.user.username }, { email: req.body.user.email }] }, (error: Error, user: UserModel) => {
-    if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+  if (req.body.user) {
 
-    if (user) return res.status(200).json({ ok: false, data: null, message: 'FORMS_ERRORS.USER_EXISTS' });
+    User.findOne({ $or: [{ username: req.body.user.username }, { email: req.body.user.email }] }, (error: Error, user: UserModel) => {
+      if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
-    return createUser(req, res);
-  });
+      if (user) return res.status(200).json({ ok: false, data: null, message: 'FORMS_ERRORS.USER_EXISTS' });
 
+      return createUser(req, res);
+    });
+
+  } else {
+    return setErrorResponse(res, ERROR_TYPE.BAD_REQUEST, 'User does not exist in body object.');
+  }
 });
 
-module.exports = app;
+module.exports = app; 

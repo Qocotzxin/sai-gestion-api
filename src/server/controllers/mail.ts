@@ -5,11 +5,10 @@
 
 import * as nodemailer from "nodemailer";
 const SendGridTransport = require('nodemailer-sendgrid-transport');
-import { SENDGRID_API_KEY } from "../config/config";
 
 const options = {
   auth: {
-    api_key: SENDGRID_API_KEY
+    api_key: process.env.SENDGRID_API_KEY
   }
 }
 
@@ -32,6 +31,10 @@ export function setSignupEmailBody(link: string, language: string) {
   return language === 'es' ? esEmailTemplate(link) : enEmailTemplate(link);
 }
 
+/**
+ * Returns the html styled email output in spanish.
+ * @param link: string
+ */
 function esEmailTemplate(link: string) {
   return `
   <div style="display: block; width: 600px">
@@ -51,6 +54,10 @@ function esEmailTemplate(link: string) {
   `;
 }
 
+/**
+ * Returns the html styled email output in english.
+ * @param link: string
+ */
 function enEmailTemplate(link: string) {
   return `
   <div style="display: block; width: 600px">

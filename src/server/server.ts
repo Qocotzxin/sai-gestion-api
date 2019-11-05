@@ -2,19 +2,19 @@
  * SAI - Copyright 2019
  *  Cristian Etchebarne
  */
-
+import * as dotenv from 'dotenv';
+dotenv.config();
+import compression from 'compression';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import mongoose from 'mongoose';
 import { CORS_CONFIG } from './config/config';
-require('dotenv').config()
-require('./config/config');
-const compression = require('compression');
+
 const app = express();
 
 mongoose.connect(
-  process.env.URL_DB,
+  process.env.DB_URL,
   { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true },
   err => {
     if (err) {
@@ -22,6 +22,7 @@ mongoose.connect(
     }
   }
 );
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors(CORS_CONFIG));

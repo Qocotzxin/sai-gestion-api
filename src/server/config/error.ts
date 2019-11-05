@@ -11,6 +11,10 @@ import { Response } from 'express';
  */
 export enum ERROR_TYPE {
   /**
+   * Error code: 400
+   */
+  BAD_REQUEST = 'BAD_REQUEST',
+  /**
    * Error code: 401
    */
   UNAUTHORIZED = 'UNAUTHORIZED',
@@ -42,6 +46,10 @@ export enum ERROR_TYPE {
  * prepared for translation on front end.
  */
 export const ERROR = {
+  BAD_REQUEST: {
+    CODE: 400,
+    MESSAGE: 'HTTP_ERRORS.BAD_REQUEST'
+  },
   UNAUTHORIZED: {
     CODE: 401,
     MESSAGE: 'HTTP_ERRORS.UNAUTHORIZED'
@@ -73,6 +81,6 @@ export const ERROR = {
  * @param res: Response 
  * @param type: ERROR_TYPE
  */
-export function setErrorResponse(res: Response, type: ERROR_TYPE): Response {
-  return res.status(ERROR[type].CODE).json({ ok: false, message: ERROR[type].MESSAGE });
+export function setErrorResponse(res: Response, type: ERROR_TYPE, description?: string): Response {
+  return res.status(ERROR[type].CODE).json({ ok: false, message: ERROR[type].MESSAGE, description: description || 'N/A' });
 }
