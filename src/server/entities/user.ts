@@ -3,9 +3,9 @@
  *  Cristian Etchebarne
  */
 
+import * as mongoose from "mongoose";
+import { emailValidatorFn } from "../utils/functions/custom-validators";
 import { USER_ROLE, USER_STATUS } from "./models";
-
-const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const userRoles = {
   values: ['ADMIN', 'EMPLOYEE'],
@@ -25,25 +25,32 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
   username: {
     type: String,
-    unique: true,
-    required: [true, "Username is mandatory"]
+    unique: [true, "Username already exists."],
+    required: false,
+    minlength: 3,
+    maxlength: 50
   },
   email: {
     type: String,
-    unique: true,
-    required: [true, "Email is mandatory"]
+    unique: [true, "Email already exists"],
+    required: [true, "Email is mandatory."],
+    validate: emailValidatorFn
   },
   firstname: {
     type: String,
-    required: [true, "First name is mandatory"]
+    required: [true, "First name is mandatory."],
+    minlength: 3,
+    maxlength: 50
   },
   lastname: {
     type: String,
-    required: [true, "Last name is mandatory"]
+    required: [true, "Last name is mandatory."],
+    minlength: 3,
+    maxlength: 50
   },
   password: {
     type: String,
-    required: [true, "Password is mandatory"]
+    required: [true, "Password is mandatory."],
   },
   image: {
     type: String,
@@ -55,9 +62,10 @@ const userSchema = new Schema({
   },
   status: {
     type: USER_STATUS,
-    default: "PENDING",
+    default: USER_STATUS.PENDING,
     enum: userStatus
-  }
+  },
+  preferences: Schema.Types.Mixed
 }, { timestamps: true });
 
 /**

@@ -10,8 +10,13 @@ export enum USER_ROLE {
 
 export enum USER_STATUS {
   PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
+  ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE'
+}
+
+export interface UserPreferences {
+  lang: string;
+  theme?: string;
 }
 
 export interface UserModel {
@@ -23,4 +28,5 @@ export interface UserModel {
   password: string;
   role: USER_ROLE;
   status: USER_STATUS;
+  preferences: UserPreferences;
 }

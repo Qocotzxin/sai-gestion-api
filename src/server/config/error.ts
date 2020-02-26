@@ -38,6 +38,10 @@ export enum ERROR_TYPE {
    * Error code: 0
    */
   UNKNOWN = 'UNKNOWN',
+  /**
+   * Error code: 400 (User exists case)
+   */
+  USER_EXISTS = 'USER_EXISTS'
 }
 
 /**
@@ -73,6 +77,10 @@ export const ERROR = {
   UNKNOWN: {
     CODE: 0,
     MESSAGE: 'HTTP_ERRORS.UNKNOWN'
+  },
+  USER_EXISTS: {
+    CODE: 400,
+    MESSAGE: 'FORM_ERROR.USER_EXISTS'
   }
 };
 
@@ -81,6 +89,6 @@ export const ERROR = {
  * @param res: Response 
  * @param type: ERROR_TYPE
  */
-export function setErrorResponse(res: Response, type: ERROR_TYPE, description?: string): Response {
-  return res.status(ERROR[type].CODE).json({ ok: false, message: ERROR[type].MESSAGE, description: description || 'N/A' });
+export function setErrorResponse(res: Response, type: ERROR_TYPE, description?: string, notificationType?: string): Response {
+  return res.status(ERROR[type].CODE).json({ ok: false, message: ERROR[type].MESSAGE, description: description || 'N/A', type: notificationType });
 }

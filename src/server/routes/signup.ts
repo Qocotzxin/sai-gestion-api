@@ -4,10 +4,11 @@
  */
 
 import express, { Request, Response } from 'express';
-import { Document, Model } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import { ERROR_TYPE, setErrorResponse } from '../config/error';
 import { mailer, setSignupEmailBody, setSignupEmailSubject } from '../controllers';
 import { UserModel, USER_ROLE } from '../entities/models';
+import { passwordValidatorFn } from '../utils/functions/custom-validators';
 const User: Model<Document> = require("../entities/user");
 const bcrypt = require("bcrypt");
 
@@ -19,11 +20,16 @@ const app = express();
  * @param res: Response
  */
 function createUser(req: Request, res: Response) {
-  const { email, firstname, lastname, username, password } = req.body.user;
+  const { email, firstname, lastname, username, password, preferences } = req.body.user;
 
   User.find({}, (e: Error, users: Document[]) => {
     if (e) {
       return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+    }
+
+    // Password validation is not through mongoose.
+    if (!passwordValidatorFn(password)) {
+      return setErrorResponse(res, ERROR_TYPE.BAD_REQUEST, "Password does not comply with required criteria.");
     }
 
     const NewUser = new User({
@@ -32,17 +38,19 @@ function createUser(req: Request, res: Response) {
       lastname,
       username,
       password: bcrypt.hashSync(password, 10),
-      role: (users.length) ? USER_ROLE.EMPLOYEE : USER_ROLE.ADMIN
+      role: (users.length) ? USER_ROLE.EMPLOYEE : USER_ROLE.ADMIN,
+      preferences
     });
 
-    NewUser.save({}, (saveError: Error, savedUser: Document & UserModel) => {
-      if (saveError || !savedUser) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
+    NewUser.save({}, (saveError: mongoose.Error.ValidationError, savedUser: Document & UserModel) => {
+      if (saveError) return setErrorResponse(res, ERROR_TYPE.BAD_REQUEST, saveError.message);
+      if (!savedUser) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
       const emailOptions = {
         to: [email],
         from: 'no-reply@sai.com',
-        subject: setSignupEmailSubject(req.body.language),
-        html: setSignupEmailBody(`${process.env.ORIGIN_BASEPATH}/profile/${savedUser.id}`, req.body.language)
+        subject: setSignupEmailSubject(savedUser.preferences.lang),
+        html: setSignupEmailBody(`${process.env.ORIGIN_BASEPATH}/profile/${savedUser.id}`, savedUser.preferences.lang)
       };
 
       mailer.sendMail(emailOptions, (err, response) => {
@@ -66,10 +74,10 @@ app.post('/v1/signup', (req: Request, res: Response) => {
 
   if (req.body.user) {
 
-    User.findOne({ $or: [{ username: req.body.user.username }, { email: req.body.user.email }] }, (error: Error, user: UserModel) => {
+    User.findOne({ $or: [{ email: req.body.user.email }, { username: req.body.user.username }] }, (error: Error, user: UserModel) => {
       if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
-      if (user) return res.status(200).json({ ok: false, data: null, message: 'FORMS_ERRORS.USER_EXISTS' });
+      if (user) return setErrorResponse(res, ERROR_TYPE.USER_EXISTS, 'N/A', 'warning');
 
       return createUser(req, res);
     });
