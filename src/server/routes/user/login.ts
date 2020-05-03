@@ -5,9 +5,9 @@
 
 import express, { Request, Response } from 'express';
 import jwt from "jsonwebtoken";
-import { ERROR_TYPE, setErrorResponse } from '../config/error';
-import { UserModel, USER_STATUS } from '../entities/models';
-const User = require("../entities/user");
+import { ERROR_TYPE, setErrorResponse } from '../../config/error';
+import { UserModel, USER_STATUS } from '../../entities/models';
+const User = require("../../entities/user");
 const bcrypt = require("bcrypt");
 const app = express();
 
@@ -18,21 +18,17 @@ const createToken = (user: UserModel) => {
 };
 
 /**
- * Endpoint: /v1/login
+ * Endpoint: /v1/user/login
  * Login endpoint that returns a jwt in case user is authorized.
  */
-app.post('/v1/login', (req: Request, res: Response) => {
+app.post('/v1/user/login', (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   User.findOne({ $or: [{ username }, { email: username }], $and: [{ status: USER_STATUS.ACTIVE }] },
     (error: Error, user: UserModel) => {
       if (error) return setErrorResponse(res, ERROR_TYPE.INTERNAL);
 
-      if (!user) return setErrorResponse(res, ERROR_TYPE.UNAUTHORIZED);
-
-      if (!bcrypt.compareSync(password, user.password)) {
-        return setErrorResponse(res, ERROR_TYPE.FORBIDDEN);
-      }
+      if (!user || !bcrypt.compareSync(password, user.password)) return setErrorResponse(res, ERROR_TYPE.UNAUTHORIZED);
 
       const token = createToken(user);
 
@@ -44,6 +40,7 @@ app.post('/v1/login', (req: Request, res: Response) => {
           firstname: user.firstname,
           lastname: user.lastname,
           preferences: user.preferences,
+          role: user.role,
           token
         }, message: 'User authorized'
       });

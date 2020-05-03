@@ -16,7 +16,8 @@ export enum USER_STATUS {
 
 export interface UserPreferences {
   lang: string;
-  theme?: string;
+  tz: string;
+  darkTheme: boolean;
 }
 
 export interface UserModel {

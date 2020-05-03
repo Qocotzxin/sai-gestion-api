@@ -5,11 +5,11 @@
 
 import express, { Request, Response } from 'express';
 import mongoose, { Document, Model } from 'mongoose';
-import { ERROR_TYPE, setErrorResponse } from '../config/error';
-import { mailer, setSignupEmailBody, setSignupEmailSubject } from '../controllers';
-import { UserModel, USER_ROLE } from '../entities/models';
-import { passwordValidatorFn } from '../utils/functions/custom-validators';
-const User: Model<Document> = require("../entities/user");
+import { ERROR_TYPE, setErrorResponse } from '../../config/error';
+import { mailer, setSignupEmailBody, setSignupEmailSubject } from '../../controllers';
+import { UserModel, USER_ROLE } from '../../entities/models';
+import { passwordValidatorFn } from '../../utils/functions/custom-validators';
+const User: Model<Document> = require("../../entities/user");
 const bcrypt = require("bcrypt");
 
 const app = express();
@@ -67,10 +67,10 @@ function createUser(req: Request, res: Response) {
 }
 
 /**
- * Endpoint: /v1/signup
+ * Endpoint: /v1/user/signup
  * Creates a new user and sends an email to confirm.
  */
-app.post('/v1/signup', (req: Request, res: Response) => {
+app.post('/v1/user/signup', (req: Request, res: Response) => {
 
   if (req.body.user) {
 
