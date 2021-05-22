@@ -55,7 +55,7 @@ function getWeatherData(positionData: WeatherDataParams, res: Response) {
 function searchLocationByIp(req: Request, res: Response) {
   request(
     {
-      // Get IP from request inly in production to avoid proxy from Heroku.
+      // Get IP from request only in production to avoid proxy from Heroku.
       url:
         process.env.NODE_ENV !== 'dev'
           ? `${IPINFO_URL}/${req.headers['x-forwarded-for']}${IPINFO_TOKEN}`
@@ -66,9 +66,10 @@ function searchLocationByIp(req: Request, res: Response) {
       const parsedBody: IPInfoResponse = JSON.parse(body);
 
       if (parsedBody.loc) {
+        const locSplit = parsedBody.loc.split(',');
         const coordinates: SimpleCoordinates = {
-          latitude: +parsedBody.loc.split(',')[0],
-          longitude: +parsedBody.loc.split(',')[1],
+          latitude: +locSplit[0],
+          longitude: +locSplit[1],
         };
 
         getWeatherData({ coordinates }, res);
