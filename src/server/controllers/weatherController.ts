@@ -1,3 +1,8 @@
+/*!
+ * SAI - Copyright 2019
+ *  Cristian Etchebarne
+ */
+
 import { Request, Response } from 'express';
 import request from 'request';
 import {

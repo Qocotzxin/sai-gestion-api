@@ -1,3 +1,8 @@
+/*!
+ * SAI - Copyright 2019
+ *  Cristian Etchebarne
+ */
+
 import { ERROR_TYPE, setErrorResponse } from '@/config/error';
 import { UserModel, USER_ROLE, USER_STATUS } from 'src/server/schemas/models';
 import { passwordValidatorFn } from '@/utils/functions/custom-validators';
