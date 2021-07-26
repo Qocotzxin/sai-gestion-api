@@ -3,37 +3,37 @@
  *  Cristian Etchebarne
  */
 
-import * as nodemailer from "nodemailer";
+import * as nodemailer from 'nodemailer';
 const SendGridTransport = require('nodemailer-sendgrid-transport');
 
 const options = {
   auth: {
-    api_key: process.env.SENDGRID_API_KEY
-  }
-}
+    api_key: process.env.SENDGRID_API_KEY,
+  },
+};
 
 export const mailer = nodemailer.createTransport(SendGridTransport(options));
 
 /**
  * Sets the email subject for the signup process based on the language.
- * @param lang: string 
  */
-export function setSignupEmailSubject(lang: string) {
-  return (lang === 'es') ? 'Gracias por registrarse en SAI!' : 'Thanks for registering into SAI!';
+export function setSignupEmailSubject(lang?: string) {
+  return !lang || lang === 'es'
+    ? 'Gracias por registrarse en SAI!'
+    : 'Thanks for registering to SAI!';
 }
 
 /**
  * Sets the email body for the signup process based on the language.
- * @param link: string
- * @param lang: string 
  */
-export function setSignupEmailBody(link: string, language: string) {
-  return language === 'es' ? esEmailTemplate(link) : enEmailTemplate(link);
+export function setSignupEmailBody(link: string, language?: string) {
+  return !language || language === 'es'
+    ? esEmailTemplate(link)
+    : enEmailTemplate(link);
 }
 
 /**
  * Returns the html styled email output in spanish.
- * @param link: string
  */
 function esEmailTemplate(link: string) {
   return `
@@ -56,7 +56,6 @@ function esEmailTemplate(link: string) {
 
 /**
  * Returns the html styled email output in english.
- * @param link: string
  */
 function enEmailTemplate(link: string) {
   return `

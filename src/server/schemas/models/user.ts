@@ -24,8 +24,8 @@ export interface UserModel {
   id: string;
   username: string;
   email: string;
-  firstname: string;
-  lastname: string;
+  firstName: string;
+  lastName: string;
   password: string;
   role: USER_ROLE;
   status: USER_STATUS;

@@ -25,15 +25,6 @@ export const OW_PARAMS = `&appid=${process.env.OPEN_WEATHER_API_KEY}&lang=es&uni
  * Configuracion para CORS
  */
 export const CORS_CONFIG: CorsOptions = {
-  allowedHeaders: [
-    'Origin',
-    'X-Requested-With',
-    'Content-Type',
-    'Accept',
-    'X-Access-Token',
-  ],
-  credentials: true,
   methods: 'GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE',
   origin: process.env.ORIGIN_BASEPATH,
-  preflightContinue: false,
 };

@@ -29,6 +29,6 @@ app.use(cors(CORS_CONFIG));
 app.use(require('./routes/index'));
 app.use(compression());
 
-app.listen(process.env.PORT, () => { 
+app.listen(process.env.PORT, () => {
   console.log(`Listening server on port ${process.env.PORT}`);
 });

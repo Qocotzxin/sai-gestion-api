@@ -1,4 +1,10 @@
 {
+  "ts-node": {
+    "transpileOnly": true,
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  },
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
@@ -7,8 +13,40 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./"
+    "baseUrl": ".",
+    "paths": {
+      "@/config/*": [
+        "src/server/config/*"
+      ],
+      "@/controllers/*": [
+        "src/server/controllers/*"
+      ],
+      "@/schemas/*": [
+        "src/server/schemas/*"
+      ],
+      "@/models/*": [
+        "src/server/schemas/models*"
+      ],
+      "@/middlewares/*": [
+        "src/server/middlewares/*"
+      ],
+      "@/public/*": [
+        "src/server/public/*"
+      ],
+      "@/routes/*": [
+        "src/server/routes/*"
+      ],
+      "@/utils/*": [
+        "src/server/utils/*"
+      ],
+    },
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "dist"
+  ]
 }
