@@ -16,33 +16,33 @@
     "baseUrl": ".",
     "paths": {
       "@/config/*": [
-        "src/server/config/*"
+        "api/config/*"
       ],
       "@/controllers/*": [
-        "src/server/controllers/*"
+        "api/controllers/*"
       ],
       "@/schemas/*": [
-        "src/server/schemas/*"
+        "api/schemas/*"
       ],
       "@/models/*": [
-        "src/server/schemas/models*"
+        "api/schemas/models*"
       ],
       "@/middlewares/*": [
-        "src/server/middlewares/*"
+        "api/middlewares/*"
       ],
       "@/public/*": [
-        "src/server/public/*"
+        "api/public/*"
       ],
       "@/routes/*": [
-        "src/server/routes/*"
+        "api/routes/*"
       ],
       "@/utils/*": [
-        "src/server/utils/*"
+        "api/utils/*"
       ],
     },
   },
   "include": [
-    "src/**/*"
+    "api/**/*",
   ],
   "exclude": [
     "node_modules",

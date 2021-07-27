@@ -4,7 +4,7 @@
  */
 
 import { ERROR_TYPE, setErrorResponse } from '@/config/error';
-import { UserModel, USER_ROLE, USER_STATUS } from 'src/server/schemas/models';
+import { UserModel, USER_ROLE, USER_STATUS } from '../schemas/models';
 import { passwordValidatorFn } from '@/utils/functions/custom-validators';
 import * as bcrypt from 'bcrypt';
 import { Request, Response } from 'express';
